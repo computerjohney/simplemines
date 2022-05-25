@@ -1,12 +1,12 @@
 const cellPrototype = {};
-const size = 7;
+const size = 9;
 let firstClick = true;
 
 //background
 document.querySelector("body").style.backgroundColor = "#60b347";
 const container = document.querySelector(".container");
 
-// array of size,size
+//2 dimensional array of size,size
 let arrayCell = new Array(size);
 for (let r = 0; r < size; r++) {
   arrayCell[r] = new Array(size);
@@ -72,6 +72,7 @@ function makeMines(row, col) {
   while (i < size) {
     let rand1 = Math.floor(Math.random() * size);
     let rand2 = Math.floor(Math.random() * size);
+    // don't mine the first cell clicked...
     if (rand1 == row && rand2 == col) continue;
     arrayCell[rand1][rand2].mined = true;
     i++;
@@ -81,6 +82,7 @@ function makeMines(row, col) {
 //function showMines() {}
 function getNeighbors(row, col, that) {
   let arrayNeighbors = new Array();
+
   arrayNeighbors.push([row - 1, col - 1]);
   arrayNeighbors.push([row - 1, col]);
   arrayNeighbors.push([row - 1, col + 1]);
@@ -93,15 +95,49 @@ function getNeighbors(row, col, that) {
   let total = 0;
   //
   //console.log(arrayNeighbors);
-  console.log(`1st:${arrayNeighbors[0]}`);
-  console.log(arrayCell[arrayNeighbors[0][0]][arrayNeighbors[0][1]]);
+  //console.log(arrayCell[arrayNeighbors[0][0]][arrayNeighbors[0][1]]);
   //
-  // need to prune out negatives and size
-  //
+  // need to prune out negatives and >=size
+
+  //arrayNeighbors.filter((item) => item.some((v) => v < 0));
+  // tested with .some
+
+  //arrayNeighbors.filter((a) => a[0] < 0 || a[1] < 0);
+
+  // data = data.filter(function (element) {
+  //   return element !== undefined;
+  // });
+
   for (let i = 0; i < arrayNeighbors.length; i++) {
     console.log(arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]]);
+  }
+
+  for (let i = 0; i < arrayNeighbors.length; i++) {
+    if (arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]].mined) total++;
   }
 
   var t = document.createTextNode(`${total}`);
   that.appendChild(t);
 }
+
+//examples
+// var a = [
+//   [1, 2, 3],
+//   [4, 5, 6],
+//   [7, 8, 9],
+// ];
+// var b = [
+//   [1, 2, 3],
+//   [4, 5, 6],
+// ];
+
+// function array_equals(a, b) {
+//   return a.length === b.length && a.every((item, idx) => item === b[idx]);
+// }
+
+// function diff(A, B) {
+//   return A.filter((test) => {
+//     return B.findIndex((item) => array_equals(item, test)) == -1;
+//   });
+// }
+// console.log(diff(a, b));
