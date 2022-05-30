@@ -55,32 +55,15 @@ function clickFunction(row, col, that) {
     "background-color: white; outline: none; border: solid beige 1px; ";
 
   // log clicked cell...
-  console.log(arrayCell[row][col]);
+  //console.log(arrayCell[row][col]);
   if (firstClick == true) makeMines(row, col);
   firstClick = false;
-  var t = document.createTextNode(`💥`);
+  var t = document.createTextNode("💥");
   if (arrayCell[row][col].mined == true) {
+    that.textContent = "";
     that.appendChild(t);
   }
   // get a list of neighbor cells
-  getNeighbors(row, col, that);
-  // color the neighbors
-}
-
-function makeMines(row, col) {
-  let i = 0;
-  while (i < size) {
-    let rand1 = Math.floor(Math.random() * size);
-    let rand2 = Math.floor(Math.random() * size);
-    // don't mine the first cell clicked...
-    if (rand1 == row && rand2 == col) continue;
-    arrayCell[rand1][rand2].mined = true;
-    i++;
-  }
-}
-
-//function showMines() {}
-function getNeighbors(row, col, that) {
   let arrayNeighbors = new Array();
 
   arrayNeighbors.push([row - 1, col - 1]);
@@ -99,45 +82,32 @@ function getNeighbors(row, col, that) {
   //
   // need to prune out negatives and >=size
 
-  //arrayNeighbors.filter((item) => item.some((v) => v < 0));
-  // tested with .some
-
-  //arrayNeighbors.filter((a) => a[0] < 0 || a[1] < 0);
-
-  // data = data.filter(function (element) {
-  //   return element !== undefined;
-  // });
+  // for (let i = 0; i < arrayNeighbors.length; i++) {
+  //   if (arrayCell[arrayNeighbors[i][0]] && arrayCell[arrayNeighbors[i][1]])
+  //     console.log(arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]]);
+  // }
 
   for (let i = 0; i < arrayNeighbors.length; i++) {
-    console.log(arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]]);
-  }
-
-  for (let i = 0; i < arrayNeighbors.length; i++) {
-    if (arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]].mined) total++;
+    if (arrayCell[arrayNeighbors[i][0]] && arrayCell[arrayNeighbors[i][1]])
+      if (arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]].mined) total++;
   }
 
   var t = document.createTextNode(`${total}`);
-  that.appendChild(t);
+  if (!arrayCell[row][col].mined) {
+    that.textContent = "";
+    that.appendChild(t);
+  }
 }
 
-//examples
-// var a = [
-//   [1, 2, 3],
-//   [4, 5, 6],
-//   [7, 8, 9],
-// ];
-// var b = [
-//   [1, 2, 3],
-//   [4, 5, 6],
-// ];
-
-// function array_equals(a, b) {
-//   return a.length === b.length && a.every((item, idx) => item === b[idx]);
-// }
-
-// function diff(A, B) {
-//   return A.filter((test) => {
-//     return B.findIndex((item) => array_equals(item, test)) == -1;
-//   });
-// }
-// console.log(diff(a, b));
+function makeMines(row, col) {
+  let i = 0;
+  while (i < 30) {
+    let rand1 = Math.floor(Math.random() * size);
+    let rand2 = Math.floor(Math.random() * size);
+    // don't mine the first cell clicked...
+    if (row !== rand1 && col !== rand2) {
+      arrayCell[rand1][rand2].mined = true;
+      i++;
+    }
+  }
+}
