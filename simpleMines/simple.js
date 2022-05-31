@@ -1,5 +1,6 @@
+const size = 6;
+const numberOfMines = 6;
 const cellPrototype = {};
-const size = 9;
 let firstClick = true;
 
 //background
@@ -33,13 +34,13 @@ function makeGrid(rows, cols) {
       //
       //HTML element creation, the VIEW
       let cellElement = document.createElement("div");
-      //cellElement.innerHTML = `${r},${c}`;
+      cellElement.id = "cellElement-" + r + "-" + c;
       container.appendChild(cellElement).className = "grid-item";
       // buttons
-      const btn = document.createElement("button");
-      cellElement.appendChild(btn);
+      const button = document.createElement("button");
+      cellElement.appendChild(button);
       // click event for each button
-      btn.addEventListener("click", function () {
+      button.addEventListener("click", function () {
         clickFunction(r, c, this);
       });
     }
@@ -54,15 +55,19 @@ function clickFunction(row, col, that) {
   that.style =
     "background-color: white; outline: none; border: solid beige 1px; ";
 
-  // log clicked cell...
-  //console.log(arrayCell[row][col]);
   if (firstClick == true) makeMines(row, col);
   firstClick = false;
-  var t = document.createTextNode("💥");
+
   if (arrayCell[row][col].mined == true) {
+    var t = document.createTextNode("💥");
     that.textContent = "";
     that.appendChild(t);
   }
+
+  // log clicked cell...
+  // console.log(`clicked: ${arrayCell[row][col]} from `);
+  // console.log(arrayCell);
+
   // get a list of neighbor cells
   let arrayNeighbors = new Array();
 
@@ -81,6 +86,7 @@ function clickFunction(row, col, that) {
   //console.log(arrayCell[arrayNeighbors[0][0]][arrayNeighbors[0][1]]);
   //
   // need to prune out negatives and >=size
+  // some arrayNeighbors are undefined
 
   // for (let i = 0; i < arrayNeighbors.length; i++) {
   //   if (arrayCell[arrayNeighbors[i][0]] && arrayCell[arrayNeighbors[i][1]])
@@ -93,21 +99,43 @@ function clickFunction(row, col, that) {
   }
 
   var t = document.createTextNode(`${total}`);
-  if (!arrayCell[row][col].mined) {
-    that.textContent = "";
-    that.appendChild(t);
-  }
+
+  //if (!arrayCell[row][col].mined && total !== 0) {
+  // clear previous
+  that.textContent = "";
+  that.appendChild(t);
+  //}
+  //
+  // if total === 0 want to recursively call click function...
+  //
 }
 
 function makeMines(row, col) {
   let i = 0;
-  while (i < 30) {
+  let minedCells = [];
+  while (i < numberOfMines) {
     let rand1 = Math.floor(Math.random() * size);
     let rand2 = Math.floor(Math.random() * size);
-    // don't mine the first cell clicked...
+
+    const minedCell = {
+      row: rand1,
+      col: rand2,
+    };
+
+    // don't mine the first cell clicked
+    // AND don't mine a cell already mined...
     if (row !== rand1 && col !== rand2) {
-      arrayCell[rand1][rand2].mined = true;
-      i++;
+      if (!minedCells.some((m) => match(m, minedCell))) {
+        // store already mined here (from WebDev Simplified)
+        // where he also goes !minedCells.some(match.bind(null, minedCell))
+        minedCells.push(minedCell);
+        arrayCell[rand1][rand2].mined = true;
+        i++;
+      }
     }
+  }
+
+  function match(a, b) {
+    return a.row === b.row && a.col === b.col;
   }
 }
