@@ -30,6 +30,7 @@ function makeGrid(rows, cols) {
       newCell.row = r;
       newCell.col = c;
       newCell.mined = false;
+      newCell.visited = false;
       arrayCell[r][c] = newCell;
       //
       //HTML element creation, the VIEW
@@ -58,10 +59,16 @@ function clickFunction(row, col, that) {
   if (firstClick == true) makeMines(row, col);
   firstClick = false;
 
+  if (arrayCell[row][col].visited == true) {
+    return;
+  }
+  arrayCell[row][col].visited = true;
+
   if (arrayCell[row][col].mined == true) {
     var t = document.createTextNode("💥");
     that.textContent = "";
     that.appendChild(t);
+    return;
   }
 
   // log clicked cell...
@@ -70,7 +77,7 @@ function clickFunction(row, col, that) {
 
   // get a list of neighbor cells
   let arrayNeighbors = new Array();
-
+  //let cleanNeighbors = new Array();
   arrayNeighbors.push([row - 1, col - 1]);
   arrayNeighbors.push([row - 1, col]);
   arrayNeighbors.push([row - 1, col + 1]);
@@ -88,25 +95,41 @@ function clickFunction(row, col, that) {
   // need to prune out negatives and >=size
   // some arrayNeighbors are undefined
 
-  // for (let i = 0; i < arrayNeighbors.length; i++) {
-  //   if (arrayCell[arrayNeighbors[i][0]] && arrayCell[arrayNeighbors[i][1]])
-  //     console.log(arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]]);
-  // }
-
   for (let i = 0; i < arrayNeighbors.length; i++) {
-    if (arrayCell[arrayNeighbors[i][0]] && arrayCell[arrayNeighbors[i][1]])
-      if (arrayCell[arrayNeighbors[i][0]][arrayNeighbors[i][1]].mined) total++;
+    let r = arrayNeighbors[i][0];
+    let c = arrayNeighbors[i][1];
+    if (arrayCell[r] && arrayCell[c]) {
+      //cleanNeighbors.push(arrayCell[r][c]);
+      if (arrayCell[r][c].mined) total++;
+    }
   }
 
   var t = document.createTextNode(`${total}`);
-
-  //if (!arrayCell[row][col].mined && total !== 0) {
-  // clear previous
-  that.textContent = "";
-  that.appendChild(t);
-  //}
+  if (!arrayCell[row][col].mined && total !== 0) {
+    //clear previous
+    that.textContent = "";
+    that.appendChild(t);
+  } else {
+    for (let i = 0; i < arrayNeighbors.length; i++) {
+      let r = arrayNeighbors[i][0];
+      let c = arrayNeighbors[i][1];
+      if (arrayCell[r] && arrayCell[c]) {
+        console.log(arrayCell[r][c]);
+        let str = "cellElement-" + r + "-" + c;
+        let thatButton = document.querySelector(str); //.firstChild;
+        console.log(thatButton);
+      }
+    }
+  }
   //
-  // if total === 0 want to recursively call click function...
+  // if total === 0 want to recursively call click function
+  // that reveals 8 arrayNeighbors cells around itself so
+  // need a return if already revealed/visited/clicked on this cell b4...
+  // propose a .visited on arrayCell
+  // propose a fn. that checks if valid cell and returns a name like cell[r,c]
+  // var str = "cellElement-" + cleanNeighbors[i][0] + "-" + cleanNeighbors[i][1];
+  // var thatButton = document.querySelector(str).firstChild;
+  // console.log(thatButton);
   //
 }
 
