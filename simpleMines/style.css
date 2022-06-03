@@ -10,10 +10,13 @@
   --grid-rows: 1;
 }
 
+body {
+  margin: 30px;
+}
+
 /* CSS GRID LAYOUT */
 .container {
-  margin: 30px;
-
+  margin: 10px 0;
   /* display: grid;
   grid-template-columns: repeat(7, 50px [col-start]);
   grid-template-rows: repeat(7, 50px [row-start]);

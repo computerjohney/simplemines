@@ -26,23 +26,29 @@ function makeGrid(rows, cols) {
     for (let c = 0; c < cols; c++) {
       //
       //make cell objects, the MODEL
+      //web dev simplified uses element.dataset.status
       const newCell = Object.create(cellPrototype);
       newCell.row = r;
       newCell.col = c;
       newCell.mined = false;
       newCell.visited = false;
+      newCell.flagged = false;
       arrayCell[r][c] = newCell;
       //
       //HTML element creation, the VIEW
       let cellElement = document.createElement("div");
-      cellElement.id = "cellElement-" + r + "-" + c;
       container.appendChild(cellElement).className = "grid-item";
       // buttons
       const button = document.createElement("button");
+      button.id = "button-" + r + "-" + c;
       cellElement.appendChild(button);
       // click event for each button
       button.addEventListener("click", function () {
         clickFunction(r, c, this);
+      });
+      button.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+        flagCell(r, c, this);
       });
     }
   }
@@ -105,19 +111,20 @@ function clickFunction(row, col, that) {
   }
 
   var t = document.createTextNode(`${total}`);
-  if (!arrayCell[row][col].mined && total !== 0) {
-    //clear previous
+  if (total !== 0) {
+    //clear previous and add a text with number of mines
     that.textContent = "";
     that.appendChild(t);
   } else {
+    // blank cells get recursive clicks
     for (let i = 0; i < arrayNeighbors.length; i++) {
       let r = arrayNeighbors[i][0];
       let c = arrayNeighbors[i][1];
       if (arrayCell[r] && arrayCell[c]) {
-        console.log(arrayCell[r][c]);
-        let str = "cellElement-" + r + "-" + c;
-        let thatButton = document.querySelector(str); //.firstChild;
-        console.log(thatButton);
+        //console.log(arrayCell[r][c]);
+        let str = "#button-" + r + "-" + c;
+        let thatButton = document.querySelector(str);
+        thatButton.click();
       }
     }
   }
@@ -127,9 +134,6 @@ function clickFunction(row, col, that) {
   // need a return if already revealed/visited/clicked on this cell b4...
   // propose a .visited on arrayCell
   // propose a fn. that checks if valid cell and returns a name like cell[r,c]
-  // var str = "cellElement-" + cleanNeighbors[i][0] + "-" + cleanNeighbors[i][1];
-  // var thatButton = document.querySelector(str).firstChild;
-  // console.log(thatButton);
   //
 }
 
@@ -161,4 +165,23 @@ function makeMines(row, col) {
   function match(a, b) {
     return a.row === b.row && a.col === b.col;
   }
+}
+
+function flagCell(row, col, that) {
+  console.log(`right clicked: ${arrayCell[row][col]} `);
+  console.log(arrayCell[row][col]);
+  if (arrayCell[row][col].visited == true) {
+    return;
+  }
+  if (arrayCell[row][col].flagged == true) {
+    arrayCell[row][col].flagged = false;
+    var empty = document.createTextNode(" ");
+    that.textContent = "";
+    that.appendChild(empty);
+    return;
+  }
+  var t = document.createTextNode("🚩");
+  arrayCell[row][col].flagged = true;
+  that.textContent = "";
+  that.appendChild(t);
 }
