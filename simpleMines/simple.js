@@ -39,16 +39,16 @@ function makeGrid(rows, cols) {
       let cellElement = document.createElement("div");
       container.appendChild(cellElement).className = "grid-item";
       // buttons
-      const button = document.createElement("button");
+      let button = document.createElement("button");
       button.id = "button-" + r + "-" + c;
       cellElement.appendChild(button);
       // click event for each button
-      button.addEventListener("click", function () {
-        clickFunction(r, c, this);
+      button.addEventListener("click", () => {
+        clickFunction(r, c, button);
       });
-      button.addEventListener("contextmenu", function (e) {
+      button.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        flagCell(r, c, this);
+        flagCell(r, c, button);
       });
     }
   }
@@ -167,21 +167,19 @@ function makeMines(row, col) {
   }
 }
 
-function flagCell(row, col, that) {
-  console.log(`right clicked: ${arrayCell[row][col]} `);
-  console.log(arrayCell[row][col]);
+function flagCell(row, col, button) {
+  // console.log(`right clicked: ${arrayCell[row][col]} `);
+  // console.log(arrayCell[row][col]);
   if (arrayCell[row][col].visited == true) {
     return;
   }
   if (arrayCell[row][col].flagged == true) {
     arrayCell[row][col].flagged = false;
-    var empty = document.createTextNode(" ");
-    that.textContent = "";
-    that.appendChild(empty);
+    button.textContent = "";
     return;
   }
   var t = document.createTextNode("🚩");
   arrayCell[row][col].flagged = true;
-  that.textContent = "";
-  that.appendChild(t);
+  button.textContent = "";
+  button.appendChild(t);
 }
