@@ -6,6 +6,8 @@ let firstClick = true;
 //background
 document.querySelector("body").style.backgroundColor = "#60b347";
 const container = document.querySelector(".container");
+const minesLeftText = document.querySelector("#mine-count");
+minesLeftText.textContent = numberOfMines;
 
 //2 dimensional array of size,size
 let arrayCell = new Array(size);
@@ -69,11 +71,23 @@ function clickFunction(row, col, that) {
     return;
   }
   arrayCell[row][col].visited = true;
+  // NOTE
+  // visited cells should not be flagged
+  if (arrayCell[row][col].flagged == true) {
+    arrayCell[row][col].flagged = false;
+    that.textContent = "";
+    countFlags();
+  }
+
+  // Here we can see if we won
 
   if (arrayCell[row][col].mined == true) {
     var t = document.createTextNode("💥");
     that.textContent = "";
     that.appendChild(t);
+    // Oh we lost
+    minesLeftText.textContent = "BOOM! You lost";
+    // reveal mines
     return;
   }
 
@@ -176,10 +190,24 @@ function flagCell(row, col, button) {
   if (arrayCell[row][col].flagged == true) {
     arrayCell[row][col].flagged = false;
     button.textContent = "";
+    countFlags();
     return;
   }
   var t = document.createTextNode("🚩");
   arrayCell[row][col].flagged = true;
   button.textContent = "";
   button.appendChild(t);
+  countFlags();
+}
+
+function countFlags() {
+  let count = 0;
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      //
+      if (arrayCell[r][c].flagged === true) count++;
+    }
+  }
+  minesLeftText.textContent = numberOfMines - count;
+  return;
 }
