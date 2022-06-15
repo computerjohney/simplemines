@@ -1,5 +1,5 @@
-const size = 6;
-const numberOfMines = 6;
+const size = 9;
+const numberOfMines = 12;
 const cellPrototype = {};
 let firstClick = true;
 
@@ -95,18 +95,8 @@ function clickFunction(row, col, that) {
   // console.log(`clicked: ${arrayCell[row][col]} from `);
   // console.log(arrayCell);
 
-  // get a list of neighbor cells
-  let arrayNeighbors = new Array();
-  //let cleanNeighbors = new Array();
-  arrayNeighbors.push([row - 1, col - 1]);
-  arrayNeighbors.push([row - 1, col]);
-  arrayNeighbors.push([row - 1, col + 1]);
-  arrayNeighbors.push([row, col - 1]);
-  //arrayNeighbors.push([row], [col]]);
-  arrayNeighbors.push([row, col + 1]);
-  arrayNeighbors.push([row + 1, col - 1]);
-  arrayNeighbors.push([row + 1, col]);
-  arrayNeighbors.push([row + 1, col + 1]);
+  // get a new list of neighbor cells
+  let arrayNeighbors = getNeighborCells(row, col);
   let total = 0;
   //
   //console.log(arrayNeighbors);
@@ -142,7 +132,7 @@ function clickFunction(row, col, that) {
       }
     }
   }
-  //
+  // Above...
   // if total === 0 want to recursively call click function
   // that reveals 8 arrayNeighbors cells around itself so
   // need a return if already revealed/visited/clicked on this cell b4...
@@ -151,9 +141,50 @@ function clickFunction(row, col, that) {
   //
 }
 
-function makeMines(row, col) {
+function getNeighborCells(row, col) {
+  let arrayNeighbors = new Array();
+
+  arrayNeighbors.push([row - 1, col - 1]);
+  arrayNeighbors.push([row - 1, col]);
+  arrayNeighbors.push([row - 1, col + 1]);
+  arrayNeighbors.push([row, col - 1]);
+  //arrayNeighbors.push([row], [col]]);
+  arrayNeighbors.push([row, col + 1]);
+  arrayNeighbors.push([row + 1, col - 1]);
+  arrayNeighbors.push([row + 1, col]);
+  arrayNeighbors.push([row + 1, col + 1]);
+
+  return arrayNeighbors;
+}
+
+function makeMines(r, c) {
   let i = 0;
   let minedCells = [];
+  let arrayNeighbors = getNeighborCells(r, c);
+
+  // make an array of objs out of array of arrays
+  function transformArrayData(data) {
+    var result = []; // new array to hold transformed data
+    var value0, value1;
+    for (var i = 0; i < data.length; i++) {
+      // loop over inner arrays
+      value0 = data[i][0];
+      value1 = data[i][1]; // and value
+
+      var cell = {
+        row: value0,
+        col: value1,
+      }; // new object for current cell
+
+      result.push(cell); // add new object to array
+    }
+    return result;
+  }
+  let arrayOfObjects = transformArrayData(arrayNeighbors);
+
+  console.log(arrayNeighbors);
+  console.log(arrayOfObjects);
+
   while (i < numberOfMines) {
     let rand1 = Math.floor(Math.random() * size);
     let rand2 = Math.floor(Math.random() * size);
@@ -164,14 +195,17 @@ function makeMines(row, col) {
     };
 
     // don't mine the first cell clicked
+    // don't mine the immediate neighbors of that cell
     // AND don't mine a cell already mined...
-    if (row !== rand1 && col !== rand2) {
-      if (!minedCells.some((m) => match(m, minedCell))) {
-        // store already mined here (from WebDev Simplified)
-        // where he also goes !minedCells.some(match.bind(null, minedCell))
-        minedCells.push(minedCell);
-        arrayCell[rand1][rand2].mined = true;
-        i++;
+    if (r !== rand1 && c !== rand2) {
+      if (!arrayOfObjects.some((m) => match(m, minedCell))) {
+        if (!minedCells.some((m) => match(m, minedCell))) {
+          // store already mined here (from WebDev Simplified)
+          // where he also goes !minedCells.some(match.bind(null, minedCell))
+          minedCells.push(minedCell);
+          arrayCell[rand1][rand2].mined = true;
+          i++;
+        }
       }
     }
   }
